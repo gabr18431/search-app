@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project 6</title>
+    <style>
+    *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body{
+        background-color: rgb(255, 208, 0);
+    }
+    .container {
+        width: 500px;
+        min-height: 50vh;
+        text-align: center;
+        color: #3e3e3e;
+        margin: 50px auto;
+    }
+    #Search {
+        min-height: 100px;
+        width: 100%;
+        padding: 30px;
+        border: 10px solid #eee;
+        font-size: 2rem;
+        text-align: center;
+        color: #808080;
+    }
+    input:focus {
+        outline: none;
+    }
+    input::placeholder {
+        text-align: center;
+        color: #cecece;
+        font-size: 2rem;
+    }
+    .list {
+        list-style: none;
+        width: 100%;
+        text-align: left;
+    }
+    .list li {
+        width: 80%;
+        min-height: 70px;
+        padding: 10px 30px;
+        border: 1px solid #ccc;
+        margin: 0 auto;
+        background-color: #eee;
+        font-size: 1.6rem;
+        color: #808080;
+        display: grid;
+        place-items: center;
+    }
+    li:nth-child(even) {
+        transform: skewX(10deg) ;
+        /* min-height: 110px; */
+    }
+    li:nth-child(odd) {
+        transform: skewX(-10deg) ;
+    }
+        li span:last-child {
+            font-size: 1.3rem;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .hl {
+            display: inline;
+            background-color: rgb(255, 187, 0);
+        }
+        span {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input type="text" id="Search" placeholder="City Or State">
+        <ul class="list">
+            <li >
+                <span >Filter For A City</span>
+            </li>
+            <li >
+                <span>Or A State</span>
+            </li>
+        </ul>
+    </div>
+
+    <script>
+        let linkData =  'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json'; 
+        const arrayData = [];
+
+        fetch(linkData).then(blob => blob.json()).then(data => arrayData.push(...data));
+        function findData(wordToMatch, arrayData) {
+            return arrayData.filter(place => {
+            let regex = new RegExp(wordToMatch, 'gi');
+            return place.city.match(regex) || place.state.match(regex); 
+            });
+        }
+        function displayMatches() {
+            let matchArray = findData(this.value, arrayData);
+            let html = matchArray.map( place => {
+                let regex = new RegExp(this.value, "gi");
+                let content = place.city.replace(regex, `
+                <span class="hl" style="color: #808080">${this.value}</span>`)
+                let userName = place.state.replace(regex, `
+                <span class="hl" style="color: #808080">${this.value}</span>`)
+                return `
+                <li >
+                    <span> ${content} , ${userName} </span>
+                    
+                </li>
+            `;
+            }).join('');
+            list.innerHTML = html;
+            if (inputSearch.value == '') {
+                list.innerHTML = `<li >
+                <span >Filter For A City</span>
+                </li>
+                <li >
+                    <span>Or A State</span>
+                </li>`
+            }
+        }
+        let inputSearch = document.querySelector('#Search')
+        let list = document.querySelector('.list')
+
+        inputSearch.addEventListener('change', displayMatches);
+        inputSearch.addEventListener('keyup', displayMatches);
+
+    </script>
+</body>
+</html>
